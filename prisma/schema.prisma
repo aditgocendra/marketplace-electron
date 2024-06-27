@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Features
+model User {
+  id       String    @id @default(uuid())
+  email    String    @unique
+  username String    @unique @db.VarChar(12)
+  profile  Profile?
+  Location Location?
+  Product  Product[]
+}
+
+model Profile {
+  avatar String @db.VarChar(100)
+  number String @db.VarChar(13)
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+}
+
+model Location {
+  province String  @db.VarChar(32)
+  regency  String  @db.VarChar(32)
+  district String  @db.VarChar(32)
+  address  String? @db.VarChar(256)
+  user     User    @relation(fields: [userId], references: [id])
+  userId   String  @unique
+}
+
+//  Product Features
+model Product {
+  id            String         @id @default(cuid())
+  name          String         @unique @db.VarChar(40)
+  price         Int
+  detailProduct DetailProduct?
+  ImageProduct  ImageProduct?
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String
+  ProductLink   ProductLink?
+}
+
+model DetailProduct {
+  description String  @db.VarChar(256)
+  seen        Int
+  fav         Int
+  product     Product @relation(fields: [productId], references: [id])
+  productId   String  @unique
+}
+
+model ImageProduct {
+  image     String
+  isThumb   Boolean
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @unique
+}
+
+model ProductLink {
+  shopee      String
+  tokopedia   String
+  tiktokShope String
+  whatsapp    String
+  product     Product @relation(fields: [productId], references: [id])
+  productId   String  @unique
+}
